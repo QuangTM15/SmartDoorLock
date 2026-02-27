@@ -3,7 +3,6 @@
 
 Servo doorServo;
 const int servoPin = 9;
-
 void initDoor()
 {
     doorServo.attach(servoPin);
