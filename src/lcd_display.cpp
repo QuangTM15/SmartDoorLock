@@ -5,20 +5,20 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 int failCount = 0;
 
-void hienthibandau() {
+void displayInitialState() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Hay nhap van tay!!! ");
 }
 
-void xulydungVanTay() {
+void handleCorrectFingerprint() {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Da mo cua");
     failCount = 0;
 }
 
-void xulysaiVanTay() {
+void handleWrongFingerprint() {
     failCount++;
     lcd.clear();
 
@@ -29,8 +29,8 @@ void xulysaiVanTay() {
         lcd.print("Vui long nhap mat khau!");
     } else {
         lcd.setCursor(0, 0);
-        lcd.print("Van tay khong dung!");
+        lcd.print("Van tay khong dung,");
         lcd.setCursor(0, 1);
-        lcd.print("Vui long thu lai!");
+        lcd.print("vui long thu lai!");
     }
 }
