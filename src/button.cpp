@@ -3,7 +3,7 @@
 
 Servo doorServo;
 const int servoPin = 9;
-<<<<<<< Updated upstream
+
 void initDoor()
 {
     doorServo.attach(servoPin);
@@ -16,16 +16,5 @@ void openDoor()
     delay(5000);
     doorServo.write(0);
 }
-=======
 
-void initDoor() {
-  doorServo.attach(servoPin);
-  doorServo.write(0); 
-}
 
-void openAndAutoCloseDoor() {
-  doorServo.write(90); 
-  delay(5000);         
-  doorServo.write(0);  
-}
->>>>>>> Stashed changes
