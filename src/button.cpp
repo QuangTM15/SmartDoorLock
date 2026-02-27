@@ -2,19 +2,16 @@
 #include <Servo.h>
 
 Servo doorServo;
-const int buttonPin = 2;
 const int servoPin = 9;
-
-void setup() {
+void initDoor()
+{
     doorServo.attach(servoPin);
-    pinMode(buttonPin, INPUT_PULLUP);
-    doorServo.write(0); 
+    doorServo.write(0);
 }
 
-void loop() {
-    if (digitalRead(buttonPin) == LOW) {
-        doorServo.write(90);
-        delay(10000); 
-        doorServo.write(0); 
-    }
+void openDoor()
+{
+    doorServo.write(90);
+    delay(5000);
+    doorServo.write(0);
 }
