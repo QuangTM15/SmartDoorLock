@@ -16,4 +16,13 @@ void openDoor()
     doorServo.write(0);
 }
 
+const int buttonPin = 2;
+void initButton() {
+    pinMode(buttonPin, INPUT_PULLUP);
+}
 
+void checkButton() {
+    if (digitalRead(buttonPin) == LOW) {
+        openDoor();
+    }
+}
