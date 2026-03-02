@@ -4,9 +4,12 @@
 SoftwareSerial mySerial(2, 3);
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
 
-bool setupFingerprint() {
+void setupFingerprint() {
     finger.begin(57600);
-    return finger.verifyPassword();
+    if (!finger.verifyPassword()) {
+        Serial.println("Khong tim thay cam bien AS608!");
+        while (1) { delay(1); }
+    }
 }
 
 int getFingerprintID() {
