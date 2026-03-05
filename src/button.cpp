@@ -4,7 +4,12 @@
 #include "pins.h"
 #include "door.h"
 
+const unsigned long debounceDelay = 50;
+
 bool lastButtonState = HIGH;
+bool buttonState = HIGH;
+
+unsigned long lastDebounceTime = 0;
 
 void initButton()
 {
@@ -13,12 +18,25 @@ void initButton()
 
 void handleButton()
 {
-    bool buttonState = digitalRead(BUTTON_PIN);
+    bool reading = digitalRead(BUTTON_PIN);
 
-    if (buttonState == LOW && lastButtonState == HIGH)
+    if (reading != lastButtonState)
     {
-        openDoor();
+        lastDebounceTime = millis();
     }
 
-    lastButtonState = buttonState;
+    if ((millis() - lastDebounceTime) > debounceDelay)
+    {
+        if (reading != buttonState)
+        {
+            buttonState = reading;
+
+            if (buttonState == LOW)
+            {
+                openDoor();
+            }
+        }
+    }
+
+    lastButtonState = reading;
 }
