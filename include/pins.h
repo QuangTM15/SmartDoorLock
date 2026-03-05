@@ -34,5 +34,7 @@
 #define LCD_ADDRESS 0x27
 #define LCD_COLS 16
 #define LCD_ROWS 2
+#define LCD_SDA A4
+#define LCD_SCL A5
 
 #endif

@@ -1,11 +1,20 @@
 #include <Arduino.h>
 
-void setup() {
-  Serial.begin(9600);
-  Serial.println("Smart Door Lock Test Start");
+#include "lcd_display.h"
+#include "door.h"
+
+void setup()
+{
+    initLCD();
+    initDoor();
+
+    showReady();
+
+    delay(2000);
+    openDoor();
 }
 
-void loop() {
-  Serial.println("System Running...");
-  delay(2000);
+void loop()
+{
+    checkDoorTimeout();
 }
