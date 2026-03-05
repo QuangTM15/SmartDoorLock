@@ -14,12 +14,12 @@ unsigned long doorOpenTime = 0;
 void initDoor()
 {
     doorServo.attach(SERVO_PIN);
-    doorServo.write(0);   // cửa đóng ban đầu
+    doorServo.write(0); 
 }
 
 void openDoor()
 {
-    doorServo.write(90);  // mở cửa
+    doorServo.write(90);  
 
     doorOpened = true;
     doorOpenTime = millis();
@@ -29,7 +29,7 @@ void openDoor()
 
 void closeDoor()
 {
-    doorServo.write(0);   // đóng cửa
+    doorServo.write(0);   
 
     doorOpened = false;
 

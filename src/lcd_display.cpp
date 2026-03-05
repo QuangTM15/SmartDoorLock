@@ -35,7 +35,7 @@ void showAccessDenied()
     // lcd.clear();
     // lcd.setCursor(0,0);
     // lcd.print("Access Denied");
-    Serial.print("Access Denied");
+    Serial.println("Access Denied");
 }
 
 void showDoorOpen()
@@ -43,7 +43,7 @@ void showDoorOpen()
     // lcd.clear();
     // lcd.setCursor(0,0);
     // lcd.print("Door Open");
-    Serial.print("Door Open");
+    Serial.println("Door Open");
 }
 
 void showDoorClosed()
@@ -51,7 +51,7 @@ void showDoorClosed()
     // lcd.clear();
     // lcd.setCursor(0,0);
     // lcd.print("Door Closed");
-    Serial.print("Door Close");
+    Serial.println("Door Close");
 }
 
 void showSystemLocked()
@@ -59,5 +59,5 @@ void showSystemLocked()
     // lcd.clear();
     // lcd.setCursor(0,0);
     // lcd.print("System Locked!");
-    Serial.print("System Locked!");
+    Serial.println("System Locked!");
 }

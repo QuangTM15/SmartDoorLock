@@ -2,19 +2,20 @@
 
 #include "lcd_display.h"
 #include "door.h"
+#include "button.h"
 
 void setup()
 {
+    Serial.begin(9600);
     initLCD();
     initDoor();
+    initButton();
 
     showReady();
-
-    delay(2000);
-    openDoor();
 }
 
 void loop()
 {
+    handleButton();
     checkDoorTimeout();
 }
