@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <EEPROM.h>
 
 #include "security.h"
 #include "config.h"
@@ -8,7 +9,7 @@
    VARIABLES
    =============================== */
 
-static String currentPassword = DEFAULT_PASSWORD;
+static char currentPassword[PASSWORD_LENGTH + 1];
 
 static int failCount = 0;
 
@@ -18,6 +19,56 @@ static unsigned long lockStartTime = 0;
 
 
 /* ===============================
+   LOAD PASSWORD FROM EEPROM
+   =============================== */
+
+void loadPassword()
+{
+    char buffer[PASSWORD_LENGTH + 1];
+
+    // đọc EEPROM
+    for (int i = 0; i < PASSWORD_LENGTH; i++)
+    {
+        buffer[i] = EEPROM.read(i);
+    }
+
+    buffer[PASSWORD_LENGTH] = '\0';
+
+    // kiểm tra password hợp lệ
+    bool valid = true;
+
+    for (int i = 0; i < PASSWORD_LENGTH; i++)
+    {
+        if (buffer[i] < '0' || buffer[i] > '9')
+        {
+            valid = false;
+            break;
+        }
+    }
+
+    if (!valid)
+    {
+        // EEPROM chứa dữ liệu rác -> reset password
+        strcpy(currentPassword, DEFAULT_PASSWORD);
+
+        for (int i = 0; i < PASSWORD_LENGTH; i++)
+        {
+            EEPROM.write(i, currentPassword[i]);
+        }
+
+        Serial.println("EEPROM invalid -> reset to default password");
+    }
+    else
+    {
+        // EEPROM hợp lệ
+        strcpy(currentPassword, buffer);
+    }
+
+    Serial.print("Password loaded: ");
+    Serial.println(currentPassword);
+}
+
+/* ===============================
    INIT
    =============================== */
 
@@ -25,6 +76,8 @@ void initSecurity()
 {
     failCount = 0;
     systemLocked = false;
+
+    loadPassword();
 }
 
 
@@ -34,12 +87,13 @@ void initSecurity()
 
 bool checkPassword(String input)
 {
-    if(systemLocked)
-    {
+    if (systemLocked)
         return false;
-    }
 
-    if(input == currentPassword)
+    char inputBuffer[PASSWORD_LENGTH + 1];
+    input.toCharArray(inputBuffer, PASSWORD_LENGTH + 1);
+
+    if (strcmp(inputBuffer, currentPassword) == 0)
     {
         resetFailCount();
         return true;
@@ -53,6 +107,40 @@ bool checkPassword(String input)
 
 
 /* ===============================
+   CHANGE PASSWORD
+   =============================== */
+
+bool changePassword(String oldPass, String newPass)
+{
+    if (systemLocked)
+        return false;
+
+    char oldBuffer[PASSWORD_LENGTH + 1];
+    char newBuffer[PASSWORD_LENGTH + 1];
+
+    oldPass.toCharArray(oldBuffer, PASSWORD_LENGTH + 1);
+    newPass.toCharArray(newBuffer, PASSWORD_LENGTH + 1);
+
+    if (strcmp(oldBuffer, currentPassword) != 0)
+        return false;
+
+    if (strlen(newBuffer) != PASSWORD_LENGTH)
+        return false;
+
+    strcpy(currentPassword, newBuffer);
+
+    for (int i = 0; i < PASSWORD_LENGTH; i++)
+    {
+        EEPROM.write(i, currentPassword[i]);
+    }
+
+    resetFailCount();
+
+    return true;
+}
+
+
+/* ===============================
    FAIL MANAGEMENT
    =============================== */
 
@@ -60,10 +148,11 @@ void increaseFailCount()
 {
     failCount++;
 
-    if(failCount >= MAX_FAIL_ATTEMPT)
+    if (failCount >= MAX_FAIL_ATTEMPT)
     {
         systemLocked = true;
         lockStartTime = millis();
+
         beepAlarm();
     }
 }
@@ -75,7 +164,7 @@ void resetFailCount()
 
 
 /* ===============================
-   SYSTEM LOCK CHECK
+   SYSTEM LOCK
    =============================== */
 
 bool isSystemLocked()
@@ -85,9 +174,9 @@ bool isSystemLocked()
 
 void checkLockTimeout()
 {
-    if(systemLocked)
+    if (systemLocked)
     {
-        if(millis() - lockStartTime >= SYSTEM_LOCK_TIME)
+        if (millis() - lockStartTime >= SYSTEM_LOCK_TIME)
         {
             systemLocked = false;
             resetFailCount();

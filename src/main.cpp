@@ -5,7 +5,7 @@
 #include "button.h"
 #include "buzzer.h"
 #include "security.h"
-#include "access_control.h"
+#include "cmd.h"
 
 void setup()
 {
@@ -19,15 +19,14 @@ void setup()
 
     showReady();
 
-    Serial.println("System Initialized");
+    Serial.println("===== SMART DOOR LOCK READY =====");
 }
 
 void loop()
 {
-    /* INPUT */
-    handleButton();       
+    handleCommand();
+    handleButton();
 
-    /* SYSTEM CHECK */
-    checkDoorTimeout();    
-    checkLockTimeout();   
+    checkDoorTimeout();
+    checkLockTimeout();
 }

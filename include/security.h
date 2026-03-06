@@ -14,6 +14,11 @@ void initSecurity();
 bool checkPassword(String input);
 
 /* ===============================
+   PASSWORD CHANGE
+   =============================== */
+bool changePassword(String oldPass, String newPass);
+
+/* ===============================
    FAIL MANAGEMENT
    =============================== */
 void increaseFailCount();
