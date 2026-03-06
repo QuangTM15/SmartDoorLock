@@ -11,7 +11,7 @@
    SECURITY CONFIGURATION
    =============================== */
 #define MAX_FAIL_ATTEMPT 5       // số lần sai tối đa
-#define SYSTEM_LOCK_TIME 30000   // khóa hệ thống (ms)
+#define SYSTEM_LOCK_TIME 10000   // khóa hệ thống (ms)
 
 
 /* ===============================
@@ -27,5 +27,10 @@
 #define PASSWORD_LENGTH 4
 #define DEFAULT_PASSWORD "1234"
 
+/* ===============================
+   EEPROM CONFIGURATION
+   =============================== */
+#define EEPROM_PASSWORD_ADDR 0
+#define EEPROM_FAIL_COUNT_ADDR 10
 
 #endif

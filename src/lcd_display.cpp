@@ -1,63 +1,75 @@
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
+
 #include "pins.h"
 #include "lcd_display.h"
 
 LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLS, LCD_ROWS);
 
+
+/* ===============================
+   INIT
+   =============================== */
+
 void initLCD()
 {
-    // lcd.init();
-    // lcd.backlight();
+    lcd.init();
+    lcd.backlight();
     Serial.println("LCD INIT");
 }
 
+
+/* ===============================
+   GENERIC DISPLAY
+   =============================== */
+
+void displayMessage(const char* line1, const char* line2)
+{
+    lcd.clear();
+
+    lcd.setCursor(0,0);
+    lcd.print(line1);
+
+    lcd.setCursor(0,1);
+    lcd.print(line2);
+}
+
+/* ===============================
+   SYSTEM STATES
+   =============================== */
+
 void showReady()
 {
-    // lcd.clear();
-    // lcd.setCursor(0,0);
-    // lcd.print("Smart Door Lock");
-    // lcd.setCursor(0,1);
-    // lcd.print("Scan Finger...");
-     Serial.println("System Ready - Scan Finger");
+    displayMessage("Smart Door Lock", "Scan Finger...");
+    Serial.println("System Ready - Scan Finger");
 }
 
 void showAccessGranted()
 {
-    // lcd.clear();
-    // lcd.setCursor(0,0);
-    // lcd.print("Access Granted");
+    displayMessage("Access Granted", "");
     Serial.println("Access Granted");
 }
 
 void showAccessDenied()
 {
-    // lcd.clear();
-    // lcd.setCursor(0,0);
-    // lcd.print("Access Denied");
+    displayMessage("Access Denied", "");
     Serial.println("Access Denied");
 }
 
 void showDoorOpen()
 {
-    // lcd.clear();
-    // lcd.setCursor(0,0);
-    // lcd.print("Door Open");
+    displayMessage("Door Open", "");
     Serial.println("Door Open");
 }
 
 void showDoorClosed()
 {
-    // lcd.clear();
-    // lcd.setCursor(0,0);
-    // lcd.print("Door Closed");
-    Serial.println("Door Close");
+    displayMessage("Door Closed", "");
+    Serial.println("Door Closed");
 }
 
 void showSystemLocked()
 {
-    // lcd.clear();
-    // lcd.setCursor(0,0);
-    // lcd.print("System Locked!");
+    displayMessage("System Locked!", "");
     Serial.println("System Locked!");
 }

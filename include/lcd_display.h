@@ -1,11 +1,12 @@
 #ifndef LCD_DISPLAY_H
 #define LCD_DISPLAY_H
-#include <LiquidCrystal_I2C.h>
-
-extern LiquidCrystal_I2C lcd;
 
 void initLCD();
 
+/* Generic display */
+void displayMessage(const char* line1, const char* line2);
+
+/* System states */
 void showReady();
 void showAccessGranted();
 void showAccessDenied();

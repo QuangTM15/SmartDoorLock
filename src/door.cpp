@@ -20,20 +20,14 @@ void initDoor()
 void openDoor()
 {
     doorServo.write(90);  
-
     doorOpened = true;
     doorOpenTime = millis();
-
-    showDoorOpen();
 }
 
 void closeDoor()
 {
     doorServo.write(0);   
-
     doorOpened = false;
-
-    showDoorClosed();
 }
 
 void checkDoorTimeout()

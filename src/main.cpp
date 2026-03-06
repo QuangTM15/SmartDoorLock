@@ -3,6 +3,8 @@
 #include "lcd_display.h"
 #include "door.h"
 #include "button.h"
+#include "buzzer.h"
+#include "security.h"
 
 void setup()
 {
@@ -10,6 +12,8 @@ void setup()
     initLCD();
     initDoor();
     initButton();
+    initBuzzer();
+    initSecurity();
 
     showReady();
 }
@@ -18,4 +22,5 @@ void loop()
 {
     handleButton();
     checkDoorTimeout();
+    checkLockTimeout();
 }
