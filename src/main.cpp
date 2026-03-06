@@ -5,10 +5,12 @@
 #include "button.h"
 #include "buzzer.h"
 #include "security.h"
+#include "access_control.h"
 
 void setup()
 {
     Serial.begin(9600);
+
     initLCD();
     initDoor();
     initButton();
@@ -16,11 +18,16 @@ void setup()
     initSecurity();
 
     showReady();
+
+    Serial.println("System Initialized");
 }
 
 void loop()
 {
-    handleButton();
-    checkDoorTimeout();
-    checkLockTimeout();
+    /* INPUT */
+    handleButton();       
+
+    /* SYSTEM CHECK */
+    checkDoorTimeout();    
+    checkLockTimeout();   
 }

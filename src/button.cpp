@@ -2,7 +2,7 @@
 
 #include "button.h"
 #include "pins.h"
-#include "door.h"
+#include "access_control.h"
 
 const unsigned long debounceDelay = 50;
 
@@ -33,7 +33,7 @@ void handleButton()
 
             if (buttonState == LOW)
             {
-                openDoor();
+                grantAccess(); 
             }
         }
     }
