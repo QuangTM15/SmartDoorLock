@@ -13,7 +13,7 @@
    =============================== */
 
 static const uint32_t FINGER_BAUDRATE = 57600;
-static const unsigned long SCAN_INTERVAL = 200;
+static const unsigned long SCAN_INTERVAL = 400;
 static const unsigned long FINGER_REMOVE_TIMEOUT = 8000;
 
 /* ===============================
@@ -117,28 +117,61 @@ static int scanFinger()
 {
     fingerSerial.listen();
 
+    static uint8_t stableReadCount = 0;
+    static unsigned long lastScanEvent = 0;
+
+    // cooldown tránh spam scan
+    if (millis() - lastScanEvent < 1200)
+        return -1;
+
     uint8_t p = finger.getImage();
 
-    // không có ngón tay
+    /* ===============================
+       NO FINGER
+       =============================== */
     if (p == FINGERPRINT_NOFINGER)
     {
         fingerPreviouslyDetected = false;
+        stableReadCount = 0;
         return -1;
     }
 
-    // tránh trigger nhiều lần khi vẫn đặt tay
+    /* ===============================
+       IMAGE DETECTED
+       cần 2 lần ổn định
+       =============================== */
+    if (p == FINGERPRINT_OK)
+    {
+        stableReadCount++;
+
+        if (stableReadCount < 2)
+            return -1;
+    }
+    else
+    {
+        return -1;
+    }
+
+    // tránh trigger nhiều lần
     if (fingerPreviouslyDetected)
         return -1;
 
     fingerPreviouslyDetected = true;
 
-    if (p != FINGERPRINT_OK)
-        return -1;
-
+    /* ===============================
+       CONVERT IMAGE
+       =============================== */
     p = finger.image2Tz(1);
-    if (p != FINGERPRINT_OK)
-        return -1;
 
+    if (p != FINGERPRINT_OK)
+    {
+        stableReadCount = 0;
+        return -1;
+    }
+
+    /* ===============================
+       SEARCH FINGER
+       =============================== */
     p = finger.fingerFastSearch();
 
     /* ===============================
@@ -146,12 +179,27 @@ static int scanFinger()
        =============================== */
     if (p == FINGERPRINT_OK)
     {
-        resetFailCount();   // reset fail counter
+        // confidence filter
+        if (finger.confidence < 70)
+        {
+            stableReadCount = 0;
+            return -1;
+        }
+
+        Serial.print("OK:FINGER_MATCH:");
+        Serial.print(finger.fingerID);
+        Serial.print(" CONF:");
+        Serial.println(finger.confidence);
+
+        resetFailCount();
+        lastScanEvent = millis();
+        stableReadCount = 0;
+
         return finger.fingerID;
     }
 
     /* ===============================
-       FINGER NOT FOUND
+       NOT FOUND
        =============================== */
     if (p == FINGERPRINT_NOTFOUND)
     {
@@ -168,9 +216,12 @@ static int scanFinger()
             denyAccess();
         }
 
+        lastScanEvent = millis();
+        stableReadCount = 0;
         return -1;
     }
 
+    stableReadCount = 0;
     return -1;
 }
 
