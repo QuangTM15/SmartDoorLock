@@ -3,6 +3,7 @@
 #include "cmd.h"
 #include "security.h"
 #include "access_control.h"
+#include "fingerprint_module.h"
 
 void processCommand(String cmd);
 
@@ -49,7 +50,6 @@ void processCommand(String cmd)
     /* ===============================
        OPEN
        =============================== */
-
     if (command == "OPEN")
     {
         if (checkPassword(param1))
@@ -67,7 +67,6 @@ void processCommand(String cmd)
     /* ===============================
        CHANGE PASSWORD
        =============================== */
-
     else if (command == "CHANGE_PASS")
     {
         if (changePassword(param1, param2))
@@ -81,9 +80,88 @@ void processCommand(String cmd)
     }
 
     /* ===============================
+       FINGER COUNT
+       =============================== */
+    else if (command == "FINGER_COUNT")
+    {
+        if (!isFingerprintReady())
+        {
+            Serial.println("ERROR:FINGERPRINT_NOT_READY");
+        }
+        else
+        {
+            Serial.print("OK:FINGER_COUNT:");
+            Serial.println(getFingerCount());
+        }
+    }
+
+    /* ===============================
+       FINGER ADD
+       FORMAT: FINGER_ADD:<password>
+       =============================== */
+    else if (command == "FINGER_ADD")
+    {
+        if (!checkPassword(param1))
+        {
+            Serial.println("ERROR:WRONG_PASSWORD");
+        }
+        else if (!isFingerprintReady())
+        {
+            Serial.println("ERROR:FINGERPRINT_NOT_READY");
+        }
+        else
+        {
+            uint8_t assignedId = 0;
+
+            if (enrollFingerAuto(assignedId))
+            {
+                Serial.print("OK:FINGER_ADDED:");
+                Serial.println(assignedId);
+            }
+            else
+            {
+                Serial.println("ERROR:FINGER_ADD_FAILED");
+            }
+        }
+    }
+
+    /* ===============================
+       FINGER DELETE
+       FORMAT: FINGER_DELETE:<password>:<id>
+       =============================== */
+    else if (command == "FINGER_DELETE")
+    {
+        if (!checkPassword(param1))
+        {
+            Serial.println("ERROR:WRONG_PASSWORD");
+        }
+        else if (!isFingerprintReady())
+        {
+            Serial.println("ERROR:FINGERPRINT_NOT_READY");
+        }
+        else
+        {
+            int id = param2.toInt();
+
+            if (id <= 0 || id > 127)
+            {
+                Serial.println("ERROR:INVALID_FINGER_ID");
+            }
+            else if (deleteFinger((uint8_t)id))
+            {
+                Serial.print("OK:FINGER_DELETED:");
+                Serial.println(id);
+            }
+            else
+            {
+                Serial.println("ERROR:FINGER_DELETE_FAILED");
+            }
+        }
+    }
+
+    /* ===============================
        STATUS
        =============================== */
-
     else if (command == "STATUS")
     {
         if (isSystemLocked())
@@ -99,7 +177,6 @@ void processCommand(String cmd)
     /* ===============================
        UNKNOWN COMMAND
        =============================== */
-
     else
     {
         Serial.println("ERROR:INVALID_COMMAND");

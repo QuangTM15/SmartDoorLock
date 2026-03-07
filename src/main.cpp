@@ -6,6 +6,7 @@
 #include "buzzer.h"
 #include "security.h"
 #include "cmd.h"
+#include "fingerprint_module.h"
 
 void setup()
 {
@@ -16,6 +17,7 @@ void setup()
     initButton();
     initBuzzer();
     initSecurity();
+    initFingerprint();
 
     showReady();
 
@@ -26,6 +28,7 @@ void loop()
 {
     handleCommand();
     handleButton();
+    handleFingerprint();
 
     checkDoorTimeout();
     checkLockTimeout();
