@@ -25,8 +25,8 @@
 /* ===============================
    BLUETOOTH HC05 (SoftwareSerial)
    =============================== */
-#define BT_RX 4
-#define BT_TX 5
+//#define BT_RX D1
+//#define BT_TX D0
 
 /* ===============================
    LCD I2C
@@ -36,5 +36,6 @@
 #define LCD_ROWS 2
 #define LCD_SDA A4
 #define LCD_SCL A5
+
 
 #endif

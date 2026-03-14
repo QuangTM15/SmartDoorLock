@@ -4,7 +4,6 @@
 #include "door.h"
 #include "pins.h"
 #include "config.h"
-#include "lcd_display.h"
 
 Servo doorServo;
 

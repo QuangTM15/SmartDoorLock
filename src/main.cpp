@@ -1,6 +1,4 @@
 #include <Arduino.h>
-
-#include "lcd_display.h"
 #include "door.h"
 #include "button.h"
 #include "buzzer.h"
@@ -12,24 +10,22 @@ void setup()
 {
     Serial.begin(9600);
 
-    initLCD();
+    initBluetooth();
     initDoor();
     initButton();
     initBuzzer();
     initSecurity();
     initFingerprint();
-
-    showReady();
-
-    Serial.println("===== SMART DOOR LOCK READY =====");
 }
 
 void loop()
 {
-    handleCommand();
-    handleButton();
-    handleFingerprint();
+    handleCommand();       // Bluetooth command
+    handleButton();        // inside button
 
-    checkDoorTimeout();
-    checkLockTimeout();
+    handleFingerprint();   // fingerprint scan
+
+    checkDoorTimeout();    // auto close door
+    checkLockTimeout();    // unlock system after timeout
 }
+

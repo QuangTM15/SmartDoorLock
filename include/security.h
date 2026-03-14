@@ -30,4 +30,6 @@ void resetFailCount();
 bool isSystemLocked();
 void checkLockTimeout();
 
+void factoryReset();
+
 #endif

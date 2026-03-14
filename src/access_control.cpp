@@ -2,7 +2,6 @@
 
 #include "access_control.h"
 #include "door.h"
-#include "lcd_display.h"
 #include "buzzer.h"
 
 /* ===============================
@@ -10,9 +9,7 @@
    =============================== */
 void grantAccess()
 {
-    showAccessGranted();
     beepSuccess();
-
     openDoor();
 }
 
@@ -22,7 +19,6 @@ void grantAccess()
    =============================== */
 void denyAccess()
 {
-    showAccessDenied();
     beepError();
 }
 
@@ -32,6 +28,5 @@ void denyAccess()
    =============================== */
 void lockedAccess()
 {
-    showSystemLocked();
     beepAlarm();
 }

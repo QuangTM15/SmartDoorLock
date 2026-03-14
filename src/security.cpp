@@ -4,6 +4,7 @@
 #include "security.h"
 #include "config.h"
 #include "buzzer.h"
+#include "fingerprint_module.h"
 
 /* ===============================
    VARIABLES
@@ -55,16 +56,12 @@ void loadPassword()
         {
             EEPROM.write(i, currentPassword[i]);
         }
-
-        Serial.println("EEPROM invalid -> reset to default password");
     }
     else
     {
         // EEPROM hợp lệ
         strcpy(currentPassword, buffer);
     }
-
-    Serial.print("Password loaded: ");
     Serial.println(currentPassword);
 }
 
@@ -181,5 +178,26 @@ void checkLockTimeout()
             systemLocked = false;
             resetFailCount();
         }
+    }
+}
+
+void factoryReset()
+{
+    // reset password về mặc định
+    strcpy(currentPassword, DEFAULT_PASSWORD);
+
+    for (int i = 0; i < PASSWORD_LENGTH; i++)
+    {
+        EEPROM.write(i, currentPassword[i]);
+    }
+
+    // reset fail
+    resetFailCount();
+    systemLocked = false;
+
+    // xóa toàn bộ fingerprint
+    for (int id = 1; id <= 127; id++)
+    {
+        deleteFinger(id);
     }
 }

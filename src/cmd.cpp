@@ -5,18 +5,27 @@
 #include "access_control.h"
 #include "fingerprint_module.h"
 
-void processCommand(String cmd);
+/* ===============================
+   INIT BLUETOOTH
+   =============================== */
 
-void handleCommand()
+void initBluetooth()
 {
-    if (Serial.available())
-    {
-        String cmd = Serial.readStringUntil('\n');
-        cmd.trim();
-
-        processCommand(cmd);
-    }
+    Serial.println("Bluetooth Ready");
 }
+
+/* ===============================
+   SEND RESPONSE
+   =============================== */
+
+void sendResponse(String msg)
+{
+    Serial.println(msg);
+}
+
+/* ===============================
+   PROCESS COMMAND
+   =============================== */
 
 void processCommand(String cmd)
 {
@@ -50,64 +59,66 @@ void processCommand(String cmd)
     /* ===============================
        OPEN
        =============================== */
+
     if (command == "OPEN")
     {
         if (checkPassword(param1))
         {
             grantAccess();
-            Serial.println("OK:DOOR_OPEN");
+            sendResponse("OK:DOOR_OPEN");
         }
         else
         {
             denyAccess();
-            Serial.println("ERROR:WRONG_PASSWORD");
+            sendResponse("ERROR:WRONG_PASSWORD");
         }
     }
 
     /* ===============================
        CHANGE PASSWORD
        =============================== */
+
     else if (command == "CHANGE_PASS")
     {
         if (changePassword(param1, param2))
         {
-            Serial.println("OK:PASS_CHANGED");
+            sendResponse("OK:PASS_CHANGED");
         }
         else
         {
-            Serial.println("ERROR:PASS_CHANGE_FAILED");
+            sendResponse("ERROR:PASS_CHANGE_FAILED");
         }
     }
 
     /* ===============================
        FINGER COUNT
        =============================== */
+
     else if (command == "FINGER_COUNT")
     {
         if (!isFingerprintReady())
         {
-            Serial.println("ERROR:FINGERPRINT_NOT_READY");
+            sendResponse("ERROR:FINGERPRINT_NOT_READY");
         }
         else
         {
-            Serial.print("OK:FINGER_COUNT:");
-            Serial.println(getFingerCount());
+            sendResponse("OK:FINGER_COUNT:" + String(getFingerCount()));
         }
     }
 
     /* ===============================
        FINGER ADD
-       FORMAT: FINGER_ADD:<password>
        =============================== */
+
     else if (command == "FINGER_ADD")
     {
         if (!checkPassword(param1))
         {
-            Serial.println("ERROR:WRONG_PASSWORD");
+            sendResponse("ERROR:WRONG_PASSWORD");
         }
         else if (!isFingerprintReady())
         {
-            Serial.println("ERROR:FINGERPRINT_NOT_READY");
+            sendResponse("ERROR:FINGERPRINT_NOT_READY");
         }
         else
         {
@@ -115,29 +126,28 @@ void processCommand(String cmd)
 
             if (enrollFingerAuto(assignedId))
             {
-                Serial.print("OK:FINGER_ADDED:");
-                Serial.println(assignedId);
+                sendResponse("OK:FINGER_ADDED:" + String(assignedId));
             }
             else
             {
-                Serial.println("ERROR:FINGER_ADD_FAILED");
+                sendResponse("ERROR:FINGER_ADD_FAILED");
             }
         }
     }
 
     /* ===============================
        FINGER DELETE
-       FORMAT: FINGER_DELETE:<password>:<id>
        =============================== */
+
     else if (command == "FINGER_DELETE")
     {
         if (!checkPassword(param1))
         {
-            Serial.println("ERROR:WRONG_PASSWORD");
+            sendResponse("ERROR:WRONG_PASSWORD");
         }
         else if (!isFingerprintReady())
         {
-            Serial.println("ERROR:FINGERPRINT_NOT_READY");
+            sendResponse("ERROR:FINGERPRINT_NOT_READY");
         }
         else
         {
@@ -145,40 +155,76 @@ void processCommand(String cmd)
 
             if (id <= 0 || id > 127)
             {
-                Serial.println("ERROR:INVALID_FINGER_ID");
+                sendResponse("ERROR:INVALID_FINGER_ID");
             }
             else if (deleteFinger((uint8_t)id))
             {
-                Serial.print("OK:FINGER_DELETED:");
-                Serial.println(id);
+                sendResponse("OK:FINGER_DELETED:" + String(id));
             }
             else
             {
-                Serial.println("ERROR:FINGER_DELETE_FAILED");
+                sendResponse("ERROR:FINGER_DELETE_FAILED");
             }
+        }
+    }
+
+    /* ===============================
+       FACTORY RESET
+       =============================== */
+
+    else if (command == "RESET")
+    {
+        if (!checkPassword(param1))
+        {
+            sendResponse("ERROR:WRONG_PASSWORD");
+        }
+        else
+        {
+            factoryReset();
+            sendResponse("OK:FACTORY_RESET_DONE");
         }
     }
 
     /* ===============================
        STATUS
        =============================== */
+
     else if (command == "STATUS")
     {
         if (isSystemLocked())
         {
-            Serial.println("OK:STATUS:LOCKED");
+            sendResponse("OK:STATUS:LOCKED");
         }
         else
         {
-            Serial.println("OK:STATUS:READY");
+            sendResponse("OK:STATUS:READY");
         }
     }
 
     /* ===============================
        UNKNOWN COMMAND
        =============================== */
+
     else
     {
-        Serial.println("ERROR:INVALID_COMMAND");
+        sendResponse("ERROR:INVALID_COMMAND");
+    }
+}
+
+/* ===============================
+   HANDLE COMMAND
+   =============================== */
+
+void handleCommand()
+{
+    if (Serial.available())
+    {
+        String cmd = Serial.readString();
+        cmd.trim();
+
+        if (cmd.length() > 0)
+        {
+            processCommand(cmd);
+        }
     }
 }
